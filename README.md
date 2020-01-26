@@ -13,9 +13,9 @@ Contents
 
 Recommended Reading
 ---
-https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-XT-Keyboard-Protocol
-https://www.pjrc.com/teensy/usb_keyboard.html
-http://www.seasip.info/VintagePC/ibm_1501105.html
+https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-XT-Keyboard-Protocol  
+https://www.pjrc.com/teensy/usb_keyboard.html  
+http://www.seasip.info/VintagePC/ibm_1501105.html  
 
 Configurables / Wiring
 ---
@@ -30,6 +30,23 @@ Project will build as long as you have `gcc-arm-embedded` in your path. Tested w
 Simply issue a `make` in the root directory after configuring configurables and installing the above toolchain.  
 A NixOS shell definition is included for the appropriate toolchain; simply use `nix-shell` in the root directory and issue `make`.
 Flash .hex using your favorite loader.
+
+Code Architecture
+---
+The code consists of two components: the ISR, and the main loop (both located in `src/main.c`.  
+The ISR's main purpose is to read bits from the XT keyboard on each falling edge of the clock signal (as per the protocol), and construct a raw byte using the bits.
+The byte is then pushed to a read buffer for consumption by the main loop.  
+The ISR is configured to be called upon the falling edge of `CLOCK_PIN` using `attachInterrupt()`.  
+
+The main loop does the following each loop:  
+- consume a byte from the read buffer
+- parse the byte into a scancode and the scan/release bit 
+- use this information to maintain a bitmap of keys held down
+- use the bitmap to construct a Teensy keyboard state
+- send the state over USB using Teensy libraries (`usb_keyboard.h`)
+
+The loop may be interrupted at any time by the ISR (except when reading from the buffer, in which case `cli()` and `sei()` is used to suppress the ISR while the read takes place
+in order to prevent a race condition).
 
 Original README:
 ---
