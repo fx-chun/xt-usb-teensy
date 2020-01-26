@@ -2,17 +2,17 @@
 TARGET = $(notdir $(CURDIR))
 
 # The teensy version to use, 30, 31, 35, 36, or LC
-TEENSY = 30
+TEENSY = 31
 
 # Set to 24000000, 48000000, or 96000000 to set CPU core speed
 TEENSY_CORE_SPEED = 48000000
 
 # Some libraries will require this to be defined
 # If you define this, you will break the default main.cpp
-#ARDUINO = 10600
+ARDUINO = 10805
 
 # configurable options
-OPTIONS = -DUSB_SERIAL -DLAYOUT_US_ENGLISH
+OPTIONS = -DUSB_KEYBOARDONLY -DLAYOUT_US_ENGLISH
 
 # directory to build in
 BUILDDIR = $(abspath $(CURDIR)/build)
@@ -49,7 +49,7 @@ COMPILERPATH = $(TOOLSPATH)/arm/bin
 #************************************************************************
 
 # CPPFLAGS = compiler options for C and C++
-CPPFLAGS = -Wall -g -Os -mthumb -ffunction-sections -fdata-sections -nostdlib -MMD $(OPTIONS) -DTEENSYDUINO=124 -DF_CPU=$(TEENSY_CORE_SPEED) -Isrc -I$(COREPATH)
+CPPFLAGS = -Wall -g -Os -mthumb -ffunction-sections -fdata-sections -nostdlib -MMD $(OPTIONS) -DTEENSYDUINO=141 -DF_CPU=$(TEENSY_CORE_SPEED) -Isrc -I$(COREPATH)
 
 # compiler options for C++ only
 CXXFLAGS = -std=gnu++0x -felide-constructors -fno-exceptions -fno-rtti
@@ -58,7 +58,7 @@ CXXFLAGS = -std=gnu++0x -felide-constructors -fno-exceptions -fno-rtti
 CFLAGS =
 
 # linker options
-LDFLAGS = -Os -Wl,--gc-sections -mthumb
+LDFLAGS = -Os -Wl,--gc-sections,--defsym=__rtc_localtime=0 -mthumb
 
 # additional libraries to link
 LIBS = -lm
@@ -99,10 +99,10 @@ else
 endif
 
 # names for the compiler programs
-CC = $(abspath $(COMPILERPATH))/arm-none-eabi-gcc
-CXX = $(abspath $(COMPILERPATH))/arm-none-eabi-g++
-OBJCOPY = $(abspath $(COMPILERPATH))/arm-none-eabi-objcopy
-SIZE = $(abspath $(COMPILERPATH))/arm-none-eabi-size
+CC =      arm-none-eabi-gcc
+CXX =     arm-none-eabi-g++
+OBJCOPY = arm-none-eabi-objcopy
+SIZE =    arm-none-eabi-size
 
 # automatically create lists of the sources and objects
 LC_FILES := $(wildcard $(LIBRARYPATH)/*/*.c)
